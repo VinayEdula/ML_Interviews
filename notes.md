@@ -66,3 +66,90 @@ When we normalize:
 ### 🔹 Key Idea
 
 > Normalization makes all input features equal in scale so that the model can learn efficiently, quickly, and stably.
+
+## 🧠 Batch Normalization — Crisp Interview Notes
+
+### 🔹 Why We Need Batch Normalization
+
+* Hidden layer inputs (activations) behave just like raw inputs — they can have very different ranges.
+* This causes **internal covariate shift**: changing activations during training make learning unstable.
+* **Batch Normalization (BN)** normalizes these activations, keeping them on a consistent scale across layers.
+
+➡️ Same logic as input normalization, but applied **inside** the network.
+
+---
+
+### 🔹 How Batch Norm Works
+
+Batch Norm is inserted **between two layers** and normalizes the outputs (activations) of one before passing them to the next.
+
+#### Steps per mini-batch:
+
+1. **Input Activations:** Take activations from the previous layer.
+2. **Compute Mean & Variance:** For each feature in the mini-batch.
+3. **Normalize:**
+   ( \hat{x} = (x - \mu_{batch}) / \sqrt{\sigma_{batch}^2 + \epsilon} )
+4. **Scale and Shift:**
+   ( y = \gamma \hat{x} + \beta )
+
+   * **γ (gamma)**: scale parameter (learnable)
+   * **β (beta)**: shift parameter (learnable)
+
+These let the network restore any necessary distribution (BN doesn’t restrict all activations to have zero mean, unit variance).
+
+---
+
+### 🔹 Parameters in Batch Norm
+
+| Type          | Parameters                           | Description                                             |
+| ------------- | ------------------------------------ | ------------------------------------------------------- |
+| Learnable     | **γ (gamma)**, **β (beta)**          | Allow re-scaling and shifting of normalized activations |
+| Non-learnable | **Moving Mean**, **Moving Variance** | Track running averages for inference                    |
+
+Each BatchNorm layer keeps its own copy of these parameters.
+
+---
+
+### 🔹 During Training vs Inference
+
+* **Training:** Uses mini-batch mean and variance. Also updates running averages (EMA) using a momentum parameter.
+* **Inference:** Uses stored **moving mean** and **moving variance** instead of batch statistics (since only one sample is input).
+
+---
+
+### 🔹 Benefits
+
+✅ Reduces **internal covariate shift**
+✅ Allows **higher learning rates**
+✅ Improves **convergence speed**
+✅ Acts as a form of **regularization** (reduces overfitting)
+✅ Makes the network **less sensitive to initialization**
+
+---
+
+### 🔹 Placement in Architecture
+
+Can be placed:
+
+* **Before activation** (as in the original paper)
+* **After activation** (common in practice)
+
+Both work — depends on experiment and framework convention.
+
+---
+
+### 🔹 Key Interview Points
+
+* **Why BN?** → Stabilizes learning by normalizing hidden activations.
+* **What does it learn?** → γ (scale) and β (shift).
+* **Training vs Inference?** → Uses batch stats during training, moving averages during inference.
+* **Advantages?** → Faster convergence,
+* regularization(Batch Norm regularizes by adding mini-batch noise and stabilizing activations, helping the model generalize better — even without Dropout.),
+* robustness to initialization(Batch Normalization makes a network robust to initialization because it normalizes activations to zero mean and unit variance, preventing exploding or vanishing values. Even if weights start poorly, BN rescales activations automatically, keeping gradients stable and training smooth from the beginning)
+* **Equation?** → `y = γ * ((x - μ)/√(σ²+ε)) + β`
+
+---
+
+### 🔹 One-line Summary
+
+> Batch Normalization keeps activations stable across layers, enabling faster, smoother, and more reliable training.
