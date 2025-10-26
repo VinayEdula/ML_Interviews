@@ -8,9 +8,7 @@ Normalization means adjusting each input feature so that it has:
 
 This is done using the formula:
 
-[
-x' = \frac{x - \mu}{\sigma}
-]
+x' = (x - μ) / σ
 
 where
 
